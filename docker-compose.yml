@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.3"
 
 services:
     ### PHP-FPM Container #######################################
@@ -88,7 +88,7 @@ services:
         image: redis:alpine
         container_name: redis
         ports:
-            - "6379:6379"
+            - "6380:6379"
         environment:
             MYSQL_ROOT_PASSWORD: 12345678
             TZ: Asia/Shanghai
