@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y \
     libmemcached-dev \
     nginx
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+
 CMD ["php-fpm"]
 
 EXPOSE 9000
