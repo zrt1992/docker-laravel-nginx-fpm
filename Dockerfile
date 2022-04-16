@@ -27,9 +27,7 @@ RUN apt-get update && apt-get install -y \
     libmemcached-dev \
     nginx \
 
-RUN chmod -R 755 /var/www/storage
-RUN cd /var/www && \
-   php artisan key:generate
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 
