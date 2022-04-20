@@ -17,6 +17,7 @@ services:
         volumes:
             - ./:/var/www
             - ./php/additional.ini:/usr/local/etc/php/conf.d/additional.ini
+#            - ./php/www.conf:/usr/local/etc/php-fpm.d/zz-docker.conf
         networks:
             - app-network
 

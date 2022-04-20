@@ -1,38 +1,65 @@
-FROM php:8.0-fpm
+FROM php:8.0-fpm-alpine3.13
 
-# Set working directory
-WORKDIR /var/www
+# Replace repositories
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN sed -i 's/9000/9005/' /usr/local/etc/php-fpm.d/zz-docker.conf
+# fix timezone
+ARG TIME_ZONE=Asia/Shanghai
+ENV TZ ${TIME_ZONE}
+RUN apk add --no-cache tzdata \
+    && cp /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+    && echo "${TIME_ZONE}" > /etc/timezone \
+    && apk del tzdata
 
-# Add docker php ext repo
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+# defined extension deps
+ENV PHP_INSTALL_EXT_DEPS \
+    # for zip
+    libzip-dev \
+    # for intl
+    icu-dev \
+    # for imap
+    imap-dev openssl-dev \
+    # for tidy
+    tidyhtml-dev \
+    # for gd
+    freetype-dev libjpeg-turbo-dev libpng-dev
 
-# Install php extensions
-RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions mbstring pdo_mysql zip exif pcntl gd memcached && \
+# Install extensions deps
+RUN apk update \
+	&& apk add --no-cache \
+    libzip \
+    icu \
+    imap c-client \
+    tidyhtml \
+    freetype libpng libjpeg-turbo \
+    && apk add --update --no-cache --virtual .build-ext-deps $PHP_INSTALL_EXT_DEPS \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-configure imap --with-imap --with-imap-ssl \
+    && docker-php-ext-configure opcache --enable-opcache \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) pdo_mysql zip intl imap tidy pcntl opcache bcmath gd \
+    && apk del .build-ext-deps
 
+# Pecl install
+RUN apk add --no-cache \
+    libmemcached \
+	&& apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+		libmemcached-dev \
+        zlib-dev \
+     && pecl install redis memcached \
+     && docker-php-ext-enable redis memcached \
+     && rm -rf /tmp/pear \
+     && apk del -f .build-deps
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    unzip \
-    git \
-    curl \
-    lua-zlib-dev \
-    libmemcached-dev \
-    nginx \
+# Use the default production configuration
+RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-
+# Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Change current user to www
+USER www-data
 
-
-
-CMD ["php-fpm"]
-
+# Exxpose port 9000 and start php-fpm server
 EXPOSE 9000
+CMD ["php-fpm"]
