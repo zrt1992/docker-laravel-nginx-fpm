@@ -2,7 +2,7 @@ FROM php:8.0-fpm-alpine3.13
 
 # Replace repositories
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
-RUN sed -i 's/9000/9005/' /usr/local/etc/php-fpm.d/zz-docker.conf
+#RUN #sed -i 's/9000/9005/' /usr/local/etc/php-fpm.d/zz-docker.conf
 # fix timezone
 ARG TIME_ZONE=Asia/Shanghai
 ENV TZ ${TIME_ZONE}
@@ -63,3 +63,4 @@ USER www-data
 # Exxpose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
+
