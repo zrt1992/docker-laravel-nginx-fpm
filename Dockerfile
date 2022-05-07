@@ -60,7 +60,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Change current user to www
 USER www-data
 
+
 # Exxpose port 9000 and start php-fpm server
 EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["php-fpm && php artisan key:generate"]
 

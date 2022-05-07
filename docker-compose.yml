@@ -2,7 +2,17 @@ version: "3.3"
 
 services:
     ### PHP-FPM Container #######################################
-
+    rabbitmq3:
+        container_name: rabbitmq
+        image: rabbitmq:3.8-management-alpine
+        environment:
+            - RABBITMQ_DEFAULT_USER=root
+            - RABBITMQ_DEFAULT_PASS=root
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        networks:
+            - app-network
     php:
         build:
             context: ./
