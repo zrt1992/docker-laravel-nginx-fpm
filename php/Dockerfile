@@ -63,3 +63,5 @@ USER www-data
 # Exxpose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
+#RUN composer install
+#RUN composer require vladimir-yuldashev/laravel-queue-rabbitmq

@@ -23,6 +23,7 @@ services:
             - redis
         restart: unless-stopped
         tty: true
+#        command: sh -c "php-fpm && composer install --ignore-platform-reqs && cp .env.example .env && php artisan key:generate"
         working_dir: /var/www
 #        command: bash -c 'php artisan generate:key'
         volumes:

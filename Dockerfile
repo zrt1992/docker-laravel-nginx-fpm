@@ -54,6 +54,8 @@ RUN apk add --no-cache \
 # Use the default production configuration
 RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
+RUN docker-php-ext-install sockets
+
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -62,6 +64,12 @@ USER www-data
 
 
 # Exxpose port 9000 and start php-fpm server
+CMD php artisan key:generate && \
+ composer require vladimir-yuldashev/laravel-queue-rabbitmq && php-fpm
 EXPOSE 9000
-CMD ["php-fpm && php artisan key:generate"]
+#CMD ["php-fpm"]
+#CMD ["php artisan", "key:generate"]
+#CMD ["php artisan key:generate"]
+#RUN sh -c "composer install --ignore-platform-reqs && cp .env.example .env && php artisan key:generate"
+
 
