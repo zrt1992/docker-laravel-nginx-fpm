@@ -13,16 +13,18 @@ use Illuminate\Support\Facades\Log;
 class TestJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $num=0;
+
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($data)
+    private  $num;
+
+    public function __construct($num)
     {
-        $this->num=$data;
+       $this->num=$num;
 
 
     }
@@ -34,7 +36,6 @@ class TestJob implements ShouldQueue
      */
     public function handle()
     {
-
-        Log::info($this->num);
+        print_r($this->num);
     }
 }

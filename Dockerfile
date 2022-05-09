@@ -64,9 +64,9 @@ USER www-data
 
 
 # Exxpose port 9000 and start php-fpm server
-CMD php artisan key:generate && \
- composer require vladimir-yuldashev/laravel-queue-rabbitmq && php-fpm
+CMD php-fpm && php artisan key:generate &&  composer require vladimir-yuldashev/laravel-queue-rabbitmq &&  php artisan migrate && php artisan queue:work
 EXPOSE 9000
+
 #CMD ["php-fpm"]
 #CMD ["php artisan", "key:generate"]
 #CMD ["php artisan key:generate"]
